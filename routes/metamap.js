@@ -78,13 +78,13 @@ const wait = (req,res, next)=>{
 router.post("/hotel_veriphy_co/webhook", (req, res)=>{
  // console.log(req.headers.host)
  // let host = req.headers.host
+ let verificationId = JSON.stringify(req.body.verificationId)
+ let email = JSON.stringify(req.body.email)
   let userID= req.body.userId
-  let email = req.body.email
-  let verificationId = req.body.verificationId
-  let access_token = req.body.access_token
+  let access_token = JSON.stringify(req.body.access_token)
   console.log(req.body)
   setTimeout(() => {
-    console.log("hsfsdfffffffad")
+    console.log("calling the metamap verification id feedback api")
     req = unirest('get', `https://api.getmati.com/v2/verifications/${req.body.verificationId}`)
     .headers({
       'Authorization': `Bearer ${req.body.access_token}`,
@@ -100,9 +100,9 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
       // console.log( response.body.documents[0].steps[0].id)
       // console.log(response.body.documents[0].steps[6].error)
      // console.log(response.body.computed.age.data)
-    //   console.log(selfieURl)
+    //  console.log(response.body)
        if(response.body.computed.age.data){
-        console.log(response.body.computed.age.data)
+      //  console.log(response.body.documents[0].steps[6])
         let idNumber=response.body.documents[0].steps[5].data.documentNumber.value;
    //   console.log(idNumber)
        let fullNamesFromMeta= response.body.documents[0].steps[5].data.fullName.value;
@@ -115,7 +115,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
        const sex= response.body.documents[0].steps[5].data.sex.value;
        let faceMatchScore = response.body.documents[0].steps[3].data.score;
       let AlterationDetected = response.body.hasProblem;
-      let onWatchList= response.body.documents[0].steps[6].error;
+      let onWatchList= null;
        let validationFrom=  response.body.documents[0].steps[0].id;
       let pdfLink = 'none';
       let  selfieURl=response.body.steps[0].data.selfiePhotoUrl;
@@ -123,10 +123,11 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
        console.log(validationFrom)
        console.log(dochasProblem)
        console.log(expirationDate) 
+       console.log(onWatchList)
         setTimeout(() => {
           console.log('udating database from backned')
           //  console.log(`${host}/users/onboarding/register/selfie/62cff6a006dbfc968862c3ac`)
-             req = unirest('PATCH', `https://www.demo.veriphy.co/users/onboarding/updatemanyregister/${userID}`)
+             req = unirest('PATCH', `https://www.hotel.veriphy.co/users/onboarding/updatemanyregister/${userID}`)
              .headers({
                'Content-Type': 'application/json'
              })
@@ -149,11 +150,15 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
      
              }))
             .end( (response) => { 
-              console.log(response.body)
+              if(response.body){
+                console.log(response.body)
+              }else{
+                console.log("no update")
+              }
           setTimeout(() => {
             if(response.body){
               console.log("send email now")     
-              var req = unirest('POST', 'https://www.demo.veriphy.co/users/metamap/sendemail')
+              var req = unirest('POST', 'https://www.hotel.veriphy.co/users/metamap/sendemail')
               .headers({
               'Content-Type': 'application/json'
           })
@@ -172,7 +177,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
           });
 
             }
-          }, 30000);
+          }, 5000);
             
           //  if(err) console.log(err)
            // console.log(req.body.identityId)
@@ -180,7 +185,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
            
          
          });
-        }, 60000);
+        }, 5000);
 
        }else{
         console.log("no computed found")
