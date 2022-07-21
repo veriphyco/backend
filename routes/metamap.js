@@ -21,7 +21,7 @@ router.post("/authtoken", (req, res)=>{
   });
 
   router.post("/startverification", (req, res)=>{
-     req = unirest('POST', 'https://api.getmati.com/v2/verifications/')
+     req =  unirest('POST', 'https://api.getmati.com/v2/verifications/')
       .headers({
         'Authorization': `Bearer ${req.body.access_token}`,
         'Content-Type': 'application/json'
@@ -75,7 +75,10 @@ const wait = (req,res, next)=>{
  },180000);
 
 }
-router.post("/hotel_veriphy_co/webhook", (req, res)=>{
+router.post("/hotel_veriphy_co/webhook",(req, res)=>{
+  setTimeout(()=>{
+    res.status(200).send({msg:"Done"})
+    },60000)
  // console.log(req.headers.host)
  // let host = req.headers.host
  let verificationId = JSON.stringify(req.body.verificationId)
@@ -85,7 +88,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
   console.log(req.body)
   setTimeout(() => {
     console.log("calling the metamap verification id feedback api")
-    req = unirest('get', `https://api.getmati.com/v2/verifications/${req.body.verificationId}`)
+    req =  unirest('get', `https://api.getmati.com/v2/verifications/${req.body.verificationId}`)
     .headers({
       'Authorization': `Bearer ${req.body.access_token}`,
       'Accept': 'application/json',
@@ -124,10 +127,10 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
        console.log(dochasProblem)
        console.log(expirationDate) 
        console.log(onWatchList)
-        setTimeout(() => {
+       
           console.log('udating database from backned')
           //  console.log(`${host}/users/onboarding/register/selfie/62cff6a006dbfc968862c3ac`)
-             req = unirest('PATCH', `https://www.hotel.veriphy.co/users/onboarding/updatemanyregister/${userID}`)
+             req =  unirest('PATCH', `https://www.hotel.veriphy.co/users/onboarding/updatemanyregister/${userID}`)
              .headers({
                'Content-Type': 'application/json'
              })
@@ -158,7 +161,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
           setTimeout(() => {
             if(response.body){
               console.log("send email now")     
-              var req = unirest('POST', 'https://www.hotel.veriphy.co/users/metamap/sendemail')
+              var req =  unirest('POST', 'https://www.hotel.veriphy.co/users/metamap/sendemail')
               .headers({
               'Content-Type': 'application/json'
           })
@@ -171,13 +174,21 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
         "dateOFBirth": dateOFBirth,
         "onWatchList": onWatchList
           }))
-         .end( (res) => { 
+         .end( (response) => { 
        // if (res.error) throw new Error(res.error); 
-        console.log(res.raw_body);
+        //console.log(res.raw_body);
+        // resp.json({msg:"FINISHED"})
+     if(response.raw_body){
+      
+      // console.log(res.body)
+     
+
+     }
+
           });
 
             }
-          }, 5000);
+          });
             
           //  if(err) console.log(err)
            // console.log(req.body.identityId)
@@ -185,7 +196,7 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
            
          
          });
-        }, 5000);
+       
 
        }else{
         console.log("no computed found")
@@ -195,10 +206,11 @@ router.post("/hotel_veriphy_co/webhook", (req, res)=>{
   }, 180000);
 
 
-  
- 
-})
 
+})
+ router.post("/home",(req, res)=>{
+  console.log("haksief")
+ })
 
 
 
