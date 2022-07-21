@@ -78,7 +78,7 @@ const wait = (req,res, next)=>{
 router.post("/hotel_veriphy_co/webhook",(req, res)=>{
   setTimeout(()=>{
     res.status(200).send({msg:"Done"})
-    },60000)
+    },240000)
  // console.log(req.headers.host)
  // let host = req.headers.host
  let verificationId = JSON.stringify(req.body.verificationId)
